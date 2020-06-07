@@ -1,0 +1,177 @@
+﻿@page
+@model HostModel
+@{
+    ViewData["Title"] = "Host - " + Model.Room.RoomName;
+}
+
+<h4>@ViewData["Title"] - <small>@Model.Room.State</small></h4>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-9">
+            <h6 class="text-info">@Model.UserMessage</h6>
+            <form method="post" asp-page-handler="ChangeDay">
+                <input type="hidden" name="RoomId" value="@Model.Room.ID" />
+                <select asp-for="Room.Day" asp-items="Model.DaySelectList" onchange="this.form.submit()">
+                    <option value="">Select a Day</option>
+                </select>
+            </form>
+        </div>
+        <div class="col-3">
+            <form method="post" asp-page-handler="TeamSelection" asp-route-RoomId="@Model.Room.ID">
+                <button class="btn btn-sm btn-outline-primary">Select Teams</button>
+            </form>
+            <form method="post" asp-page-handler="ResetRoom" asp-route-RoomId="@Model.Room.ID">
+                <button class="btn btn-sm btn-outline-warning">Reset Room</button>
+            </form>
+            <form method="post" asp-page-handler="CloseRoom" asp-route-RoomId="@Model.Room.ID">
+                <button class="btn btn-sm btn-outline-danger">Close Room</button>
+            </form>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-sm table-bordered">
+                <tbody>
+                    @foreach (var row in Model.Room.Rows)
+                    {
+                    <tr class="mb-2">
+                        @foreach (var chair in row.Chairs)
+                        {
+                            <td scope="row" class="mr-2">
+                                @if (chair.State == DOTW.Models.ChairState.Empty)
+                                {
+                                    <p class="text-muted">Empty</p>
+                                }
+                                else
+                                {
+                                    @if (chair.State == Models.ChairState.OccupiedValid)
+                                    {
+                                        @if (chair.Player != null)
+                                        {
+                                            <p class="text-success">@chair.Player.Name</p>
+                                        }
+                                        else
+                                        {<p class="text-danger">ERROR!</p>}
+                                    }
+                                    @if (chair.State == Models.ChairState.OccupiedInvalid)
+                                    {
+                                        @if (chair.Player != null)
+                                        {
+                                            <p class="text-warning">@chair.Player.Name</p>
+                                        }
+                                        else
+                                        {<p class="text-danger">ERROR!</p>}
+                                    }
+                                }
+                            </td>
+                        }
+                        @if (row.State == Models.RowState.RowComplete)
+                        {
+                            <td scope="row" class="ml-6 bg-success">
+                                <p>
+                                    <strong>@row.State - @string.Format("{0:0.00}", row.TimeToComplete.TotalSeconds) seconds</strong>
+                                </p>
+                            </td>
+                        }
+                        else
+                        {
+                            <td scope="row" class="ml-6 bg-light">
+                                <p>
+                                    @row.State
+                                </p>
+                            </td>
+                        }
+                        <td>
+                            @if (row.TempTeamId > 0)
+                            {
+                                <form method="post" asp-page-handler="TeamOut" asp-route-RoomId="@Model.Room.ID" asp-route-TeamId="@row.TempTeamId">
+                                    <button class="btn btn-link">Team Out</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-3">
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Team</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var team in Model.Teams)
+                    {
+                        <tr>
+                            <td scope="row">@team.Day</td>
+                            <td scope="row">@team.State</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-9">
+            <h6>All Players</h6>
+            <div class="card-columns">
+                @foreach (var player in Model.Players)
+                {
+                    <div class="card">
+                        <div class="card-header">
+                           <span>@player.Name <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#RenameModal-@player.ID">rename</button></span>
+                                                <div class="modal" id="RenameModal-@player.ID">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title">Rename Player: @player.ID</h4>
+                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form method="post" asp-page-handler="RenamePlayer">
+                                                                    <input type="hidden" name="RoomId" value="@Model.Room.ID" />
+                                                                    <input type="hidden" name="PlayerId" value="@player.ID" />
+                                                                    <input type="text" name="NewName" required minlength="2" maxlength="20" size="20" />
+                                                                    <input type="submit" value="Rename" class="btn btn-primary" />
+                                                                </form>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                        <div class="card-body">
+                            @if (player.State != Models.PlayerState.UnClaimed)
+                            {
+                            <form method="post" asp-page-handler="ReleasePlayer" asp-route-RoomId="@Model.Room.ID" asp-route-PlayerId="@player.ID">
+                                <button class="btn btn-sm btn-primary">Release</button>
+                            </form>
+                            }
+                            else
+                            {
+                            @player.State
+                            }
+                        </div>
+                        @if (player.Team != null)
+                        {
+                            <div class="card-footer">
+                                <span><strong>Team: </strong>@player.Team.Day</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

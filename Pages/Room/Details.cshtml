@@ -1,0 +1,43 @@
+﻿@page
+@model DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Room</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Room.HostEmail)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Room.HostEmail)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Room.RoomName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Room.RoomName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Room.State)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Room.State)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Room.PlayerCount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Room.PlayerCount)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Room.ID">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

@@ -1,0 +1,48 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Room[0].RoomName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Room[0].State)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Room[0].PlayerCount)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Room) {
+        <tr>
+            <td>
+                <a asp-page="Host" asp-route-RoomId="@item.ID">@Html.DisplayFor(modelItem => item.RoomName)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.State)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PlayerCount)
+            </td>
+            <td>
+                <a class="btn btn-sm" asp-page="./play" asp-route-RoomId="@item.ID">Play</a>
+                <a class="btn btn-sm" asp-page="./Host" asp-route-RoomId="@item.ID">Host</a>
+                <a class="btn btn-sm btn-danger" asp-page="./Delete" asp-route-Id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

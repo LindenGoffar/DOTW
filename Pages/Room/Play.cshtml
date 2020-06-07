@@ -1,0 +1,250 @@
+﻿@page
+@model PlayModel
+@{
+    if (Model.PlayerConfirmed)
+    {
+        ViewData["Title"] = Model.Player.Name + " - " + Model.Room.RoomName;
+    }
+    else
+    {
+        ViewData["Title"] = "Player - " + Model.Room.RoomName;
+    }
+
+}
+
+<h4>@ViewData["Title"] - <small>@Model.Room.State</small></h4>
+<div class="container-fluid">
+    <div class="row">
+        <h6 class="text-info">@Model.UserMessage</h6>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-sm table-bordered">
+                <tbody>
+                    @foreach (var row in Model.Room.Rows)
+                    {
+                        <tr class="mb-2">
+                            @foreach (var chair in row.Chairs)
+                            {
+                            <td class ="mr-2" scope="row">
+                                @if (chair.State == DOTW.Models.ChairState.Empty)
+                                {
+                                    @if (Model.PlayerConfirmed && Model.PlayerCanMove)
+                                    {
+                                        <form method="post" asp-page-handler="ClaimSeat" asp-route-RoomId="@Model.Room.ID" asp-route-PlayerId="@Model.Player.ID" asp-route-ChairId="@chair.ID">
+                                            <button class="btn btn-light">Empty</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="disabled btn btn-light">Empty</button>
+                                    }
+                                }
+                                else
+                                {
+                                    @if (chair.State == Models.ChairState.OccupiedValid)
+                                    {
+                                        @if (chair.Player != null)
+                                        {
+                                            @if (Model.PlayerConfirmed && Model.PlayerCanMove)
+                                            {
+                                                <form method="post" asp-page-handler="ClaimSeat" asp-route-RoomId="@Model.Room.ID" asp-route-PlayerId="@Model.Player.ID" asp-route-ChairId="@chair.ID">
+                                                    <button class="btn btn-outline-primary">@chair.Player.Name</button>
+                                                </form>
+                                            }
+                                            else { <button class="disabled btn btn-outline-primary">@chair.Player.Name</button> }
+                                        }
+                                        else
+                                        {<p class="text-danger">ERROR!</p>}
+                                    }
+                                    @if (chair.State == Models.ChairState.OccupiedInvalid)
+                                    {
+                                        @if (chair.Player != null)
+                                        {
+                                            @if (Model.PlayerConfirmed && Model.PlayerCanMove)
+                                            {
+                                                <form method="post" asp-page-handler="ClaimSeat" asp-route-RoomId="@Model.Room.ID" asp-route-PlayerId="@Model.Player.ID" asp-route-ChairId="@chair.ID">
+                                                    <button class="btn btn-outline-warning">@chair.Player.Name</button>
+                                                </form>
+                                            }
+                                            else { <button class="disabled btn btn-outline-warning">@chair.Player.Name</button> }
+                                        }
+                                        else {<p class="text-danger">ERROR!</p>}
+                                    }
+                                }
+                            </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @*<div class="col-sm-3">
+            @if (Model.PlayerConfirmed)
+            {
+                <h4>@Model.Player.Name</h4>
+                @if (Model.Player.Team != null)
+                {
+                    <div>
+                        <h6>Team: @Model.MyTeam.Day - @Model.MyTeam.State</h6>
+                        <table class="table table-sm table-bordered border border-primary">
+                            <tbody>
+                                @foreach (var teamMate in Model.MyTeamMates)
+                                {
+                                    <tr>
+                                        <td scope="row">@teamMate.Name</td>
+                                        <td scope="row">@teamMate.State</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <br/>
+                }
+            }
+            <div>
+                <h6>All Players</h6>
+                <table class="table table-sm table-bordered border border-secondary">
+                    <thead>
+                        <tr>
+                            <th scope="col">Player</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Team</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var player in Model.Room.Players)
+                        {
+                            <tr>
+                                @if (Model.PlayerConfirmed == true)
+                                {
+                                    @if (Model.Player.ID == player.ID)
+                                    {
+                                        <td scope="row" class="mark">@player.Name</td>
+                                        <td scope="row" class="mark"> That's ME! </td>
+                                    }
+                                    else
+                                    {   
+                                        <td scope="row">@player.Name</td>
+                                        <td scope="row">@player.State</td>
+                                    }
+                                }
+                                else
+                                {
+                                    <td scope="row">@player.Name</td>
+                                    @if (player.State == Models.PlayerState.UnClaimed)
+                                    {
+                                        <td scope="row">
+                                            <form method="post" asp-page-handler="ClaimUser" asp-route-RoomId="@Model.Room.ID" asp-route-PlayerId="@player.ID">
+                                                <button>Claim</button>
+                                            </form>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td scope="row">@player.State</td>
+                                    }
+
+                                }
+                                @if (player.Team != null)
+                                {
+                                    <td scope="row">
+                                        <span>@player.Team.Day</span>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>*@
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-3">
+            @if (Model.PlayerConfirmed)
+            {
+                <h4>@Model.Player.Name</h4>
+                @if (Model.Player.Team != null)
+                {
+                    <div>
+                        <h6>Team: @Model.MyTeam.Day - @Model.MyTeam.State</h6>
+                        <table class="table table-sm table-bordered border border-primary">
+                            <tbody>
+                                @foreach (var teamMate in Model.MyTeamMates)
+                                {
+                                    <tr>
+                                        <td scope="row">@teamMate.Name</td>
+                                        <td scope="row">@teamMate.State</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                }
+            }
+        </div>
+        <div class="col-9">
+            <h6>All Players</h6>
+            <div class="card-columns">
+                @foreach (var player in Model.Players)
+                {
+                    <div class="card">
+                        <div class="card-header">@player.Name</div>
+                        <div class="card-body">
+                            @if (Model.PlayerConfirmed)
+                            {
+                                @if (Model.Player.ID == player.ID)
+                                {
+                                    @if (player.State == Models.PlayerState.UnClaimed)
+                                    {
+                                        <form method="post" asp-page-handler="ClaimUser" asp-route-RoomId="@Model.Room.ID" asp-route-PlayerId="@player.ID">
+                                            <button>Claim</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="mark"> That's ME! </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>@player.State</span>
+                                }
+                            }
+                            else
+                            {
+                                @if (player.State == Models.PlayerState.UnClaimed)
+                                {
+                                    <form method="post" asp-page-handler="ClaimUser" asp-route-RoomId="@Model.Room.ID" asp-route-PlayerId="@player.ID">
+                                        <button>Claim</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span>@player.State</span>
+                                }
+                            }
+                        </div>
+                        @if (player.Team != null)
+                        {
+                            <div class="card-footer">
+                                <span><strong>Team: </strong>@player.Team.Day</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
